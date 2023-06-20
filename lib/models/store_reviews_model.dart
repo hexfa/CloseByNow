@@ -9,7 +9,7 @@ class StoreReviewsFields {
 class StoreReviewsModel {
   final String id;
   final String reviewText;
-  final double rating;
+  final int rating;
   final String createDate;
   final String userName;
   StoreReviewsModel({
@@ -34,7 +34,7 @@ class StoreReviewsModel {
     return StoreReviewsModel(
       id: map[StoreReviewsFields.id] as String,
       reviewText: map[StoreReviewsFields.reviewText] as String,
-      rating: map[StoreReviewsFields.rating] as double,
+      rating: map[StoreReviewsFields.rating] as int,
       createDate: map[StoreReviewsFields.createDate] as String,
       userName: map['user'][StoreReviewsFields.userName] as String,
     );
