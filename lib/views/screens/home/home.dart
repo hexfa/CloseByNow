@@ -5,16 +5,25 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
+import 'package:nearby_me/views/extensions/space_xy_extension.dart';
 
 import '../../../helpers/home_screen/home_controller.dart';
 import '../../../views/screens/home/local_widgets/stores_list.dart';
+import '../../widgets/api_error_handling.dart';
 import '../../widgets/loading_content.dart';
 import 'local_widgets/not_found_any_result.dart';
 import 'local_widgets/search_result_title.dart';
 import 'local_widgets/waiting_for_search.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool isHighlighted = true;
 
   HomeController homeController = Get.put<HomeController>(HomeController());
 
@@ -85,19 +94,54 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () async {
-                      final String location = await getLocation();
-                      _searchController.text = '';
-                      _searchController.text = location;
-                      await homeController.searchApi(location);
+                  5.0.spaceX,
+                  InkWell(
+                    highlightColor: Colors.transparent,
+                    splashColor: Colors.transparent,
+                    onHighlightChanged: (value) {
+                      setState(() {
+                        isHighlighted = !isHighlighted;
+                      });
                     },
-                    icon: const Icon(Icons.location_pin),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    onTap: () async {
+                      final String location = await getLocation();
+                      if (location.contains('permission') ||
+                          location.contains('access')) {
+                        Get.defaultDialog(middleText: location);
+                      } else {
+                        _searchController.text = '';
+                        _searchController.text = location;
+                        await homeController.updateQuery(location);
+                      }
+                    },
+                    child: AnimatedContainer(
+                      margin: EdgeInsets.all(isHighlighted ? 0 : 2.5),
+                      curve: Curves.fastLinearToSlowEaseIn,
+                      duration: const Duration(milliseconds: 300),
+                      height: isHighlighted ? 48 : 43,
+                      width: isHighlighted ? 48 : 43,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: Theme.of(context).colorScheme.primary,
+                        shape: BoxShape.rectangle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .shadow
+                                .withOpacity(.5),
+                            offset: const Offset(5, 10),
+                            blurRadius: 30,
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.location_on,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        size: isHighlighted ? 33 : 28,
+                      ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -106,20 +150,27 @@ class HomeScreen extends StatelessWidget {
                 if (controller.isLoading) {
                   return const LoadingContents();
                 }
-                return controller.storesList.isEmpty
-                    ? controller.searchQuery.isEmpty
-                        ? const WaitingForSearch()
-                        : const NotFoundAnyResult()
-                    : Column(
-                        children: [
-                          SearchResultTitle(
-                            cityName: controller.searchQuery,
-                          ),
-                          StoresList(
-                            storesList: controller.storesList,
-                          ),
-                        ],
-                      );
+                if (controller.errorMessage.isNotEmpty) {
+                  return ApiErrorHandling(
+                    errorMessage: controller.errorMessage,
+                  );
+                } else if (controller.storesList.isEmpty &&
+                    controller.errorMessage.isEmpty) {
+                  return controller.searchQuery.isEmpty
+                      ? const WaitingForSearch()
+                      : const NotFoundAnyResult();
+                } else {
+                  return Column(
+                    children: [
+                      SearchResultTitle(
+                        cityName: controller.searchQuery,
+                      ),
+                      StoresList(
+                        storesList: controller.storesList,
+                      ),
+                    ],
+                  );
+                }
               },
             ),
           ],
@@ -150,19 +201,19 @@ class HomeScreen extends StatelessWidget {
 
       switch (permission) {
         case LocationPermission.denied:
-          throw 'Location permission denied';
+          return 'Location permission denied\nplease change permission status on app setting.';
         case LocationPermission.deniedForever:
-          throw 'Location permission denied forever';
+          return 'Location permission denied forever\nplease change permission status on app setting.';
         case LocationPermission.always:
           return permissionAccepted();
         case LocationPermission.whileInUse:
           return permissionAccepted();
 
         default:
-          'Location permission';
+          'Can\'t access to your location';
       }
 
-      return 'Can\'t access to your local';
+      return 'Can\'t access to your location';
     } on PlatformException catch (e) {
       log(e.toString());
       return 'error';

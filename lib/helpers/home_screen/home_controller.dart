@@ -11,20 +11,36 @@ class HomeController extends GetxController {
 
   bool isLoading = false;
   List<StoresModel> storesList = [];
+  String errorMessage = '';
 
   _fetchStoresList(String location) async {
     isLoading = true;
+
     update();
     await _apiServices.getStoresList(location).then((DataState dataState) {
       if (dataState is SuccessfulDataState) {
         storesList = dataState.data;
         isLoading = false;
+        errorMessage = '';
         update();
       }
       if (dataState is FailureDataState) {
-        storesList = [];
-        isLoading = false;
-        update();
+        if (location.isEmpty) {
+          storesList = [];
+          errorMessage = '';
+          isLoading = false;
+          update();
+        } else if (dataState.error!.contains('(error 400)')) {
+          storesList = [];
+          errorMessage = '';
+          isLoading = false;
+          update();
+        } else {
+          storesList = [];
+          errorMessage = dataState.error!;
+          isLoading = false;
+          update();
+        }
       }
     });
   }
@@ -42,7 +58,7 @@ class HomeController extends GetxController {
     debounce(
       _searchQuery,
       searchApi,
-      time: const Duration(seconds: 2),
+      time: const Duration(seconds: 1),
     );
     super.onInit();
   }

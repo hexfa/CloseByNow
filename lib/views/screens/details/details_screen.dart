@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../views/widgets/api_error_handling.dart';
 import '../../../views/widgets/loading_content.dart';
 import '../../../helpers/details_screen/details_controller.dart';
 import '../../../models/stores_model.dart';
@@ -31,9 +32,13 @@ class DetailsScreen extends StatelessWidget {
               child: LoadingContents(),
             );
           }
-          return ReviewsList(
-            storeReviews: controller.storeReviews,
-          );
+          if (controller.errorMessage.isNotEmpty) {
+            return ApiErrorHandling(errorMessage: controller.errorMessage);
+          } else {
+            return ReviewsList(
+              storeReviews: controller.storeReviews,
+            );
+          }
         },
       ),
     );

@@ -32,16 +32,16 @@ class ApiServices {
       switch (dioError.response?.statusCode) {
         case 400:
           return FailureDataState(
-              'Bad Request. Message varies depending on failure scenario');
+              'Bad Request. Message varies depending on failure scenario (error 400)');
         case 401:
           return FailureDataState(
-              'The API key has either expired or doesn\'t have the required scopes to query this endpoint.');
+              'The API key has either expired or doesn\'t have the required scopes to query this endpoint. (error 401)');
         case 404:
-          return FailureDataState('Resource Not Found');
+          return FailureDataState('Resource Not Found (error 404)');
         case 500:
-          return FailureDataState('Internal Server Error');
+          return FailureDataState('Internal Server Error (error 500)');
         case 503:
-          return FailureDataState('Service Unavailable');
+          return FailureDataState('Service Unavailable (error 503)');
 
         default:
           FailureDataState('There is a problem to fetching data from server!');
@@ -69,16 +69,16 @@ class ApiServices {
       switch (dioError.response?.statusCode) {
         case 400:
           return FailureDataState(
-              'Bad Request. Message varies depending on failure scenario');
+              'Bad Request. Message varies depending on failure scenario (error 400)');
         case 401:
           return FailureDataState(
-              'The API key has either expired or doesn\'t have the required scopes to query this endpoint.');
+              'The API key has either expired or doesn\'t have the required scopes to query this endpoint. (error 401)');
         case 404:
-          return FailureDataState('Resource Not Found');
+          return FailureDataState('Resource Not Found (error 404)');
         case 500:
-          return FailureDataState('Internal Server Error');
+          return FailureDataState('Internal Server Error (error 500)');
         case 503:
-          return FailureDataState('Service Unavailable');
+          return FailureDataState('Service Unavailable (error 503)');
 
         default:
           FailureDataState('There is a problem to fetching data from server!');
