@@ -27,8 +27,8 @@ https://github.com/hexfa/CloseByNow.git
 ## Resources ℹ️
 
 - #### Remote API
-  ```bash
-https://api.yelp.com/v3/businesses
+  ```
+https://api.yelp.com
   ```
 
 ### Prerequisites
