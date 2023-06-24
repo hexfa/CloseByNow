@@ -28,11 +28,9 @@ https://github.com/hexfa/CloseByNow.git
 
 - #### Remote API
  ```bash
-https://github.com/hexfa/CloseByNow.git
+[https://github.com/hexfa/CloseByNow.git](https://api.yelp.com)
  ```
-  ```
-https://api.yelp.com
-  ```
+
 
 ### Prerequisites
 
